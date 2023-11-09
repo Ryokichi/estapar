@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      SA_PASSWORD: "o4bLty#m"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+    ports: 
+      - "1433:1433"
+    networks:
+      - estapar-network
+
+  init-db:
+      image: mcr.microsoft.com/mssql-tools
+      depends_on:
+        - sqlserver
+      volumes:
+        - ./docker/init_db.sql:/tmp/init_db.sql
+        - ./docker/initdb.sh:/tmp/initdb.sh
+      command: /bin/bash ./tmp/initdb.sh
+      networks:
+        - estapar-network
+
+networks:
+  estapar-network:
+    driver: bridge
