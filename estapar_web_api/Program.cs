@@ -12,10 +12,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<EstaparDbContext>(optionsBuilder => optionsBuilder.UseSqlServer("Name=ConnectionStrings:ConnectToEstaparDB"));
 builder.Services.AddTransient<DatabaseSeeder>();
+builder.Services.AddTransient<CommomService>();
+builder.Services.AddTransient<CarroService>();
+builder.Services.AddTransient<FechamentoService>();
+builder.Services.AddTransient<TempoMedioService>();
 
 var app = builder.Build();
-
-
 
 if (args.Length == 1 && args[0].ToLower() == "seeddata")
     SeedData(app);
