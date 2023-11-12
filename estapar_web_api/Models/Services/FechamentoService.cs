@@ -8,6 +8,10 @@ public class FechamentoService : CommomService
 
     public List<FechamentoDTO>ExecutaFecahamentoDoPeriodo(string CodGaragem, DateTime DataInicio, DateTime DataFim )
     {
+        // Pega carros no periodo, depois para cada um deles calcula o valor da estadia caso ja nao tenha claculado anteriormente
+        // e no caso da necessidade de calcular, utilizar o design abstract factory https://refactoring.guru/pt-br/design-patterns/abstract-factory
+        // para criar o meio de pagamento adequado. Armazena tudo isso num objeto que representa o fechamento da garagem no periodo.
+
 
         List<FechamentoDTO> Fechamento = new List<FechamentoDTO>();
         List<FormaPagamento> FormasPagamento = DB.FormaPagamento.ToList();

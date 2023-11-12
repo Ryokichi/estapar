@@ -19,7 +19,7 @@ public class CommomService
 
     public double CalculaPrecoEstadia(DateTime DataInicio, DateTime DataFim, double PrecoHora1, double PrecoHoraExtra)
     {
-        int PeriodoMinutos, HorasExtras, MinutosExtras;
+        int PeriodoMinutos, HorasExtras = 0, MinutosExtras = 0;
         double TotalACobrar;
 
         PeriodoMinutos = GetTimeSpanEmMinutos(DataInicio, DataFim);
@@ -30,10 +30,11 @@ public class CommomService
             MinutosExtras = PeriodoMinutos % 60;
 
             TotalACobrar += HorasExtras * PrecoHoraExtra;
-            TotalACobrar += (MinutosExtras > 30) ? PrecoHoraExtra : PrecoHoraExtra/2.0;
+            if (MinutosExtras != 0)
+                TotalACobrar += (MinutosExtras > 30) ? PrecoHoraExtra : PrecoHoraExtra/2.0;
         }
-
-        return Math.Truncate(TotalACobrar * 100) / 100;
+        // return Math.Floor(TotalACobrar*100)/100;
+        return TotalACobrar;
     }
 
     public List<Passagem> BuscaCarrosNoPeriodoPorFormaPagto(string CodGaragem, DateTime DataInicio, DateTime DataFim, String Pagamento )

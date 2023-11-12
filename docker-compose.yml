@@ -1,6 +1,17 @@
 version: '3.8'
 
 services:
+  # dotnet-env:
+  #   build: ./
+  #   volumes:
+  #     - ./:/app
+  #   ports:
+  #     - "8080:80"
+  #   depends_on:
+  #     - sqlserver
+  #   networks:
+  #     - estapar-network
+
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
