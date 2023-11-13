@@ -1,14 +1,18 @@
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
-ARG TARGETARCH
 WORKDIR /source
-COPY ./estapar_web_api/*.csproj .
+
+COPY ./ ./
+WORKDIR /source/estapar_web_api
+# RUN dotnet user-secrets init
+# RUN dotnet user-secrets set ConnectionStrings:ConnectToEstaparDB "Data Source=localhost;Initial Catalog=EstaparDB;User Id=SA;Password=o4bLty#m;TrustServerCertificate=True"
+# RUN dotnet run seeddata
 RUN dotnet restore
+RUN dotnet publish -c release -o /app --no-restore
 
-COPY ./estapar_web_api/ .
-RUN dotnet publish -c Release -o /app
 
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
+# final stage/image
+FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
-COPY --from=build /app .
-USER $APP_UID
-ENTRYPOINT ["./estapar_web_api"]
+COPY --from=build /app ./
+EXPOSE 80 8080
+ENTRYPOINT ["dotnet", "estapar_web_api.dll"]
