@@ -1,4 +1,5 @@
 using System.Data;
+using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers;
@@ -40,6 +41,28 @@ public class EstaparAdminController : ControllerBase
     {
         List<TempoMedioDTO> TempoMedioDto = Service.ExecutaCalculoDeTempoMedioNoPeriodo(CodGaragem, DataInicio, DataFim);
         return Ok(TempoMedioDto);
+    }
+
+    [HttpPost("{CodGaragem}/registrar-entrada")]
+    public IActionResult postNovatEntradaCarro(string CodGaragem, [FromBody] PassagemCadastroEntrada DadosDaEntrada, [FromServices] CarroService Service)
+    {
+        RegistroPassagemDTO PostCadastroNovaPassagem = Service.PostCadastroNovaPassagem(CodGaragem, DadosDaEntrada);
+        return Ok(PostCadastroNovaPassagem);
+    }
+
+    [HttpPost("{CodGaragem}/registrar-saida")]
+    public IActionResult posSaidaCarrostring(string CodGaragem, [FromBody] PassagemCadastroSaida DadosDaSaida, [FromServices] CarroService Service)
+    {
+        RegistroPassagemDTO TempoMedioDto = Service.PostCadastroSaidaPassagem(CodGaragem, DadosDaSaida);
+        return Ok(TempoMedioDto);
+    }
+
+    [HttpPost("{CodGaragem}/seed-passagem-db")]
+    public IActionResult postSeedPassagemDB(string CodGaragem, [FromBody] string DadosDaEntrada, [FromServices] CarroService Service)
+    {
+        Console.WriteLine(DadosDaEntrada);
+        // string PostCadastroNovaPassagem = Service.PostCadastroNovaPassagem(CodGaragem, DadosDaEntrada);
+        return Ok(new {Mensagem = "Recebido"});
     }
 
 }

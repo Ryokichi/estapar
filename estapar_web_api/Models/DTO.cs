@@ -12,12 +12,19 @@ public class CarroDTO
     public string CarroModelo { get; set; }
     public DateTime DataHoraEntrada { get; set; }
     public DateTime? DataHoraSaida { get; set; }
+    public double ValorTotal { get; set; }
 }
 
 public class UltimaEntradaCarroDTO
 {
     public string CarroPlaca { get; set; }
     public DateTime DataHoraEntrada { get; set; }
+}
+
+public class RegistroPassagemDTO
+{
+    public string Mensagem { get; set; }
+    public CarroDTO? Passagem { get; set; }
 }
 
 public class FechamentoDTO 

@@ -95,4 +95,102 @@ public class CarroService : CommomService
             })
             .ToList();
     }
+
+    public RegistroPassagemDTO PostCadastroNovaPassagem(string CodGaragem, PassagemCadastroEntrada DadosEntrada)
+    {
+        string MsgToUser = "";
+        var Garagem = DB.Garagem.Where(g => g.Codigo == CodGaragem).FirstOrDefault();
+        var passagem = DB.Passagem.Where(p => p.Garagem.Codigo == CodGaragem
+            && p.CarroPlaca == DadosEntrada.CarroPlaca)
+            .OrderBy(p => p.DataHoraEntrada)
+            .LastOrDefault();
+        CarroDTO DadosPassagem = new CarroDTO();
+
+        if (Garagem == null)
+        {
+            MsgToUser = "Garagem não encontrada";
+        }
+        else if (passagem != null && passagem.DataHoraSaida == null)
+        {
+            MsgToUser = "Já existe um registro de entrada sem saida para este carro";
+            DadosPassagem = convertePassagemParaDTO(passagem);
+
+        }
+        else if( (passagem == null || passagem.DataHoraSaida != null) && Garagem != null)
+        {
+            DateTime dataHoraEntrada = DateTime.Parse(DateTime.Now.ToString("s"));
+            passagem = new Passagem
+            {
+                Garagem = Garagem,
+                CarroPlaca = DadosEntrada.CarroPlaca,
+                CarroMarca = DadosEntrada.CarroMarca,
+                CarroModelo = DadosEntrada.CarroModelo,
+                DataHoraEntrada = dataHoraEntrada
+            };
+            DB.Passagem.Add(passagem);
+            DB.SaveChanges();
+            MsgToUser = "Registro Salvo";
+            DadosPassagem = convertePassagemParaDTO(passagem);
+        }
+
+            return new RegistroPassagemDTO {
+            Mensagem = MsgToUser,
+            Passagem = DadosPassagem
+        };
+    }
+
+    public RegistroPassagemDTO PostCadastroSaidaPassagem(string CodGaragem, PassagemCadastroSaida DadosSaida)
+    {
+        string MsgToUser = "";
+        var Garagem = DB.Garagem.Where(g => g.Codigo == CodGaragem).FirstOrDefault();
+        var passagem = DB.Passagem.Where(p => p.Garagem.Codigo == CodGaragem
+            && p.CarroPlaca == DadosSaida.CarroPlaca)
+            .OrderBy(p => p.DataHoraEntrada)
+            .LastOrDefault();
+        CarroDTO DadosPassagem = new CarroDTO();
+
+        if (Garagem == null)
+        {
+            MsgToUser = "Garagem não encontrada";
+        }
+        else if (passagem == null )
+        {
+            MsgToUser = "Não existe entrada para o carro informado";
+        }
+        else if (passagem.DataHoraSaida != null) {
+            MsgToUser = "Já existe uma saida registrada para esse veículo";
+            DadosPassagem = convertePassagemParaDTO(passagem);
+        }
+        else 
+        {
+            DateTime DataHoraSaida = DateTime.Parse(DateTime.Now.ToString("s"));
+            Double PrecoTotal = CalculaPrecoEstadia(passagem.DataHoraEntrada, DataHoraSaida , Garagem.Preco_1aHora , Garagem.Preco_HorasExtra);
+
+            passagem.DataHoraSaida = DataHoraSaida;
+            passagem.PrecoTotal = PrecoTotal;
+            DB.Update(passagem);
+            DB.SaveChanges();
+
+            DadosPassagem = convertePassagemParaDTO(passagem);
+
+        }
+        return new RegistroPassagemDTO {
+            Mensagem = MsgToUser,
+            Passagem = DadosPassagem
+        };
+    }
+
+    private CarroDTO convertePassagemParaDTO(Passagem passagem)
+    {
+        return new CarroDTO
+        {
+            Garagem = passagem.Garagem.Nome,
+            CarroPlaca = passagem.CarroPlaca,
+            CarroMarca = passagem.CarroMarca,
+            CarroModelo = passagem.CarroModelo,
+            DataHoraEntrada = passagem.DataHoraEntrada,
+            DataHoraSaida = passagem.DataHoraSaida,
+            ValorTotal = passagem.PrecoTotal
+        };
+    }
 }

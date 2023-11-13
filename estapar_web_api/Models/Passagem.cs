@@ -9,7 +9,4 @@ public class Passagem
     public DateTime? DataHoraSaida { get; set; }
     public FormaPagamento? FormaPagamento { get; set; }
     public double PrecoTotal  { get; set; } = 0.0;
-
-
-
 }
