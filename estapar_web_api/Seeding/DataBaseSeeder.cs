@@ -9,6 +9,7 @@ public class DatabaseSeeder
     }
     public void SeedData()
     {
+        Console.WriteLine("Seedando");
         FormaPagamentoSeeder.SeedData(context);
         GaragemSeeder.SeedData(context);
         PassagemSeeder.SeedData(context);

@@ -8,61 +8,81 @@ namespace api.Controllers;
 [Route("[controller]")]
 public class EstaparAdminController : ControllerBase
 {
-    [HttpGet("{CodGaragem}/carros-no-periodo")]
-    public IActionResult getCarrosPeriodo(string CodGaragem, [FromQuery] DateTime DataInicio, [FromQuery] DateTime DataFim, [FromServices] CarroService Service)
+    [HttpGet("{codGaragem}/carros-no-periodo")]
+    public IActionResult getCarrosPeriodo(string codGaragem, [FromQuery] DateTime dataInicio, [FromQuery] DateTime dataFim, [FromServices] CarroService dbService)
     {
-        List<CarroDTO> CarrosDto = Service.BuscaCarrosNaGaragemPorPeriodo(CodGaragem, DataInicio, DataFim);
-        return Ok(CarrosDto);
+        List<CarroDTO> carrosDto = dbService.BuscaCarrosNaGaragemPorPeriodo(codGaragem, dataInicio, dataFim);
+        return Ok(carrosDto);
     }
 
-    [HttpGet("{CodGaragem}/carros-estacionados")]
-    public IActionResult getCarrosEstacionados(string CodGaragem, [FromServices] CarroService Service)
+    [HttpGet("{codGaragem}/carros-estacionados")]
+    public IActionResult getCarrosEstacionados(string codGaragem, [FromServices] CarroService dbService)
     {
-        List<CarroDTO> CarrosDto = Service.BuscaCarrosEstacionados(CodGaragem);
-        return Ok(CarrosDto);
+        List<CarroDTO> carrosDto = dbService.BuscaCarrosEstacionados(codGaragem);
+        return Ok(carrosDto);
     }
 
-    [HttpGet("{CodGaragem}/carros-que-passaram")]
-    public IActionResult getCarrosQuePassaram(string CodGaragem, [FromServices] CarroService Service)
+    [HttpGet("{codGaragem}/carros-que-passaram")]
+    public IActionResult getCarrosQuePassaram(string codGaragem, [FromServices] CarroService dbService)
     {
-        List<CarroDTO> CarrosDto = Service.BuscaCarrosQuePassaram(CodGaragem);
-        return Ok(CarrosDto);
+        List<CarroDTO> carrosDto = dbService.BuscaCarrosQuePassaram(codGaragem);
+        return Ok(carrosDto);
     }
 
-    [HttpGet("{CodGaragem}/fechamento-periodo")]
-    public IActionResult getFechamentoPeriodo(string CodGaragem, [FromQuery] DateTime DataInicio, [FromQuery] DateTime DataFim, [FromServices] FechamentoService Service)
+    [HttpGet("{codGaragem}/fechamento-periodo")]
+    public IActionResult getFechamentoPeriodo(string codGaragem, [FromQuery] DateTime dataInicio, [FromQuery] DateTime dataFim, [FromServices] FechamentoService dbService)
     {
-        List<FechamentoDTO> FechamentoDto = Service.ExecutaFecahamentoDoPeriodo(CodGaragem, DataInicio, DataFim);
-        return Ok(FechamentoDto);
+        List<FechamentoDTO> fechamentoDto = dbService.ExecutaFecahamentoDoPeriodo(codGaragem, dataInicio, dataFim);
+        return Ok(fechamentoDto);
     }
 
-    [HttpGet("{CodGaragem}/tempo-medio")]
-    public IActionResult getTempoMedio(string CodGaragem, [FromQuery] DateTime DataInicio, [FromQuery] DateTime DataFim, [FromServices] TempoMedioService Service)
+    [HttpGet("{codGaragem}/tempo-medio")]
+    public IActionResult getTempoMedio(string codGaragem, [FromQuery] DateTime dataInicio, [FromQuery] DateTime dataFim, [FromServices] TempoMedioService dbService)
     {
-        List<TempoMedioDTO> TempoMedioDto = Service.ExecutaCalculoDeTempoMedioNoPeriodo(CodGaragem, DataInicio, DataFim);
-        return Ok(TempoMedioDto);
+        List<TempoMedioDTO> tempoMedioDto = dbService.ExecutaCalculoDeTempoMedioNoPeriodo(codGaragem, dataInicio, dataFim);
+        return Ok(tempoMedioDto);
     }
 
-    [HttpPost("{CodGaragem}/registrar-entrada")]
-    public IActionResult postNovatEntradaCarro(string CodGaragem, [FromBody] PassagemCadastroEntrada DadosDaEntrada, [FromServices] CarroService Service)
+    [HttpPost("{codGaragem}/registrar-entrada")]
+    public IActionResult postNovatEntradaCarro(string codGaragem, [FromBody] PassagemCadastroEntrada dadosDaEntrada, [FromServices] CarroService dbService)
     {
-        RegistroPassagemDTO PostCadastroNovaPassagem = Service.PostCadastroNovaPassagem(CodGaragem, DadosDaEntrada);
-        return Ok(PostCadastroNovaPassagem);
+        RegistroPassagemDTO postCadastroNovaPassagem = dbService.PostCadastroNovaPassagem(codGaragem, dadosDaEntrada);
+        return Ok(postCadastroNovaPassagem);
     }
 
-    [HttpPost("{CodGaragem}/registrar-saida")]
-    public IActionResult posSaidaCarrostring(string CodGaragem, [FromBody] PassagemCadastroSaida DadosDaSaida, [FromServices] CarroService Service)
+    [HttpPost("{codGaragem}/registrar-saida")]
+    public IActionResult posSaidaCarrostring(string codGaragem, [FromBody] PassagemCadastroSaida dadosDaSaida, [FromServices] CarroService dbService)
     {
-        RegistroPassagemDTO TempoMedioDto = Service.PostCadastroSaidaPassagem(CodGaragem, DadosDaSaida);
-        return Ok(TempoMedioDto);
+        RegistroPassagemDTO tempoMedioDto = dbService.PostCadastroSaidaPassagem(codGaragem, dadosDaSaida);
+        return Ok(tempoMedioDto);
     }
 
-    [HttpPost("{CodGaragem}/seed-passagem-db")]
-    public IActionResult postSeedPassagemDB(string CodGaragem, [FromBody] string DadosDaEntrada, [FromServices] CarroService Service)
+    [HttpPost("seed-passagem-db")]
+    public IActionResult postSeedPassagemDB([FromBody] List<PassagemDTO> dadosDaEntrada, [FromServices] CarroService dbService)
     {
-        Console.WriteLine(DadosDaEntrada);
-        // string PostCadastroNovaPassagem = Service.PostCadastroNovaPassagem(CodGaragem, DadosDaEntrada);
-        return Ok(new {Mensagem = "Recebido"});
+        object postCadastroNovasPassagens = dbService.PostSeedPassagemDB(dadosDaEntrada);
+        return Ok(postCadastroNovasPassagens);
+    }
+
+    [HttpGet("lista-todas-garagens")]
+    public IActionResult getListaGaragens([FromServices] CommomService dbService)
+    {
+        List<Garagem> garagens = dbService.GetTodasGaragens();
+        return Ok(garagens);
+    }
+
+    [HttpGet("lista-todos-pagamentos")]
+    public IActionResult getListaPagamentos([FromServices] CarroService dbService)
+    {
+        List<FormaPagamento> pagamentos = dbService.GetTodosPagamentos();
+        return Ok(pagamentos);
+    }
+
+    [HttpGet("lista-todas-passagens")]
+    public IActionResult getListapassagens([FromServices] CarroService dbService)
+    {
+        List<Passagem> passagens = dbService.GetTodasPassagens();
+        return Ok(passagens);
     }
 
 }

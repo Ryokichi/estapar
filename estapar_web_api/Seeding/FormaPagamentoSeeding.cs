@@ -4,6 +4,7 @@ public static class FormaPagamentoSeeder
 {
     public static void SeedData(EstaparDbContext context)
     {
+        Console.WriteLine(context.FormaPagamento.Any());
         if (!context.FormaPagamento.Any())
         {
             var formasPagamento = new List<FormaPagamento>

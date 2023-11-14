@@ -1,21 +1,20 @@
 version: '3.8'
 
 services:
-  dotnet-env:
-    build: ./
-    ports:
-      - "80:80"
-      - "8080:8080"
-      - "8081:5043"
-    depends_on:
-      - sqlserver
-    networks:
-      - estapar-network
+  # dotnet-env:
+  #   build: ./
+  #   ports:
+  #     - "80:80"
+  #     - "8080:8080"
+  #   depends_on:
+  #     - sqlserver
+  #   networks:
+  #     - estapar-network
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
-      SA_PASSWORD: "o4bLty#m"
+      SA_PASSWORD: "passwd-db-estapar"
       ACCEPT_EULA: "Y"
       MSSQL_PID: "Developer"
     ports: 

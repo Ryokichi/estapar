@@ -9,6 +9,21 @@ public class CommomService
         this.DB = ctx;
     }
 
+    public List<Garagem> GetTodasGaragens()
+    {
+        return DB.Garagem.ToList();
+    }
+
+    public List<FormaPagamento> GetTodosPagamentos()
+    {
+        return DB.FormaPagamento.ToList();
+    }
+
+    public List<Passagem> GetTodasPassagens()
+    {
+        return DB.Passagem.ToList();
+    }
+
     public int GetTimeSpanEmMinutos(DateTime DataInicio, DateTime DataFim)
     {
         TimeSpan Diferenca = DataInicio - DataFim;
@@ -17,33 +32,40 @@ public class CommomService
         return SpanMinutos;
     }
 
-    public double CalculaPrecoEstadia(DateTime DataInicio, DateTime DataFim, double PrecoHora1, double PrecoHoraExtra)
+    public double CalculaPrecoEstadia( Garagem garagem, Passagem passagem)
     {
-        int PeriodoMinutos, HorasExtras = 0, MinutosExtras = 0;
+        if (passagem.FormaPagamento.Codigo == "MEN" || passagem.DataHoraSaida == null)
+            return 0;
+
+        DateTime DataInicio = passagem.DataHoraEntrada;
+        DateTime DataFim = passagem.DataHoraSaida.Value;
+        double PrecoHora1 = garagem.Preco_1aHora;
+        double PrecoHoraExtra = garagem.Preco_HorasExtra;
         double TotalACobrar;
+        int PeriodoMinutos, Horas, Minutos;
 
         PeriodoMinutos = GetTimeSpanEmMinutos(DataInicio, DataFim);
-
         TotalACobrar = PrecoHora1;
         if (PeriodoMinutos > 60) {
-            HorasExtras = (PeriodoMinutos - 60) / 60;
-            MinutosExtras = PeriodoMinutos % 60;
+            Horas =  (PeriodoMinutos / 60) - 1;
+            Minutos = PeriodoMinutos % 60;
 
-            TotalACobrar += HorasExtras * PrecoHoraExtra;
-            if (MinutosExtras != 0)
-                TotalACobrar += (MinutosExtras > 30) ? PrecoHoraExtra : PrecoHoraExtra/2.0;
+            TotalACobrar += (Horas >= 1) ? Horas * PrecoHoraExtra : 0;
+            if (Minutos > 0)
+                TotalACobrar += (Minutos > 30) ? PrecoHoraExtra : PrecoHoraExtra/2.0;
         }
-        // return Math.Floor(TotalACobrar*100)/100;
+        // TotalACobrar = Math.Truncate(TotalACobrar * 100.0 ) / 100;
+        TotalACobrar = Math.Round(TotalACobrar, 2);
         return TotalACobrar;
     }
 
-    public List<Passagem> BuscaCarrosNoPeriodoPorFormaPagto(string CodGaragem, DateTime DataInicio, DateTime DataFim, String Pagamento )
+    public List<Passagem> BuscaCarrosNoPeriodoPorFormaPagto(string codGaragem, DateTime dataInicio, DateTime dataFim, String pagamento )
     {
         return DB.Passagem
-            .Where(p => p.Garagem.Codigo == CodGaragem
-                && p.FormaPagamento.Codigo == Pagamento
-                && p.DataHoraSaida >= DataInicio
-                && p.DataHoraSaida <= DataFim
+            .Where(p => p.Garagem.Codigo == codGaragem
+                && p.FormaPagamento.Codigo == pagamento
+                && p.DataHoraSaida >= dataInicio
+                && p.DataHoraSaida <= dataFim
             )
             .ToList();
     }

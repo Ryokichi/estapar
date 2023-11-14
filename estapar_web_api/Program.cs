@@ -4,12 +4,16 @@ using estapar_web_api;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var port = 8080;
+builder.Configuration["Urls"] = $"http://localhost:{port}";
 
 builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-// builder.Services.AddDbContext<EstaparDbContext>(optionsBuilder => optionsBuilder.UseSqlServer("Name=ConnectionStrings:ConnectToEstaparDB"));
-builder.Services.AddDbContext<EstaparDbContext>(optionsBuilder => optionsBuilder.UseSqlServer(builder.Configuration.GetConnectionString("ConnectToEstaparDB")));
+builder.Services.AddDbContext<EstaparDbContext>(optionsBuilder => optionsBuilder.UseSqlServer("Name=ConnectionStrings:ConnectToEstaparDB"));
+builder.Services.AddTransient<DatabaseSeeder>();
+builder.Services.AddTransient<CommomService>();
 builder.Services.AddTransient<CarroService>();
 builder.Services.AddTransient<FechamentoService>();
 builder.Services.AddTransient<TempoMedioService>();

@@ -6,58 +6,66 @@ public class FechamentoService : CommomService
     {
     }
 
-    public List<FechamentoDTO>ExecutaFecahamentoDoPeriodo(string CodGaragem, DateTime DataInicio, DateTime DataFim )
+    public List<FechamentoDTO>ExecutaFecahamentoDoPeriodo(string codGaragem, DateTime dataInicio, DateTime dataFim )
     {
-        // Pega carros no periodo, depois para cada um deles calcula o valor da estadia caso ja nao tenha claculado anteriormente
+        // Pegar carros no periodo, depois para cada um deles calcula o valor da estadia caso ja nao tenha claculado anteriormente
         // e no caso da necessidade de calcular, utilizar o design abstract factory https://refactoring.guru/pt-br/design-patterns/abstract-factory
         // para criar o meio de pagamento adequado. Armazena tudo isso num objeto que representa o fechamento da garagem no periodo.
 
 
-        List<FechamentoDTO> Fechamento = new List<FechamentoDTO>();
-        List<FormaPagamento> FormasPagamento = DB.FormaPagamento.ToList();
-        Garagem DadosGaragem = DB.Garagem.Where(g => g.Codigo == CodGaragem).First();
+        List<FechamentoDTO> fechamento = new List<FechamentoDTO>();
+        List<FormaPagamento> formasPagamento = DB.FormaPagamento.ToList();
+        Garagem garagem = DB.Garagem.Where(g => g.Codigo == codGaragem).First();
 
         double TotalDoFechamento = 0;
 
-        foreach(var FormaPagamento in FormasPagamento) 
+        foreach (var formaPagamento in formasPagamento) 
         {
-            List<Passagem> PassagemDosCarros = BuscaCarrosNoPeriodoPorFormaPagto(CodGaragem, DataInicio, DataFim, FormaPagamento.Codigo);
             double TotalFormaPagto = 0;
 
-        //     ////Analisar o caso de mensalidade
-            if(FormaPagamento.Codigo == "MEN") {
-
+            ////Considera todos os mensalistas 
+            if (formaPagamento.Codigo == "MEN") {
+                int veiculosDiferentes = DB.Passagem.Where(
+                    p => p.FormaPagamento.Codigo == "MEN"
+                    && p.Garagem.Codigo == garagem.Codigo)
+                    .GroupBy(p => p.CarroPlaca).Count();
+                TotalFormaPagto = veiculosDiferentes * garagem.Preco_Mensalista;
             }
             else {
-                foreach(var passagem in PassagemDosCarros) {
+                List<Passagem> passagemDosCarros = BuscaCarrosNoPeriodoPorFormaPagto(codGaragem, dataInicio, dataFim, formaPagamento.Codigo);
+                foreach(var passagem in passagemDosCarros) {
                     if (passagem.DataHoraSaida == null)
                         continue;
+                    if (passagem.PrecoTotal == 0)
+                        fazFechamentoEstadia(garagem, passagem);
 
-                    DateTime DataHoraEntrada = passagem.DataHoraEntrada;
-                    DateTime DataHoraSaida = passagem.DataHoraSaida.Value;
-                    double PrimeiraHora = DadosGaragem.Preco_1aHora;
-                    double HoraExtra = DadosGaragem.Preco_HorasExtra;
-
-                    double ValorEstadia = CalculaPrecoEstadia(DataHoraEntrada, DataHoraSaida, PrimeiraHora, HoraExtra);
-                    TotalFormaPagto += ValorEstadia;
+                    TotalFormaPagto += passagem.PrecoTotal;
                 }
             }
 
-            Fechamento.Add(GetFechamentoDTO(DataInicio, DataFim, FormaPagamento.Descricao, TotalFormaPagto));
+            fechamento.Add(GetFechamentoDTO(dataInicio, dataFim, formaPagamento.Descricao, TotalFormaPagto));
             TotalDoFechamento += TotalFormaPagto;
         }
-        Fechamento.Add(GetFechamentoDTO(DataInicio, DataFim, "Total Consolidado", TotalDoFechamento));
-        return Fechamento;
+        fechamento.Add(GetFechamentoDTO(dataInicio, dataFim, "Total Consolidado", TotalDoFechamento));
+        return fechamento;
     }
 
-    private FechamentoDTO GetFechamentoDTO(DateTime DataInicio, DateTime DataFim, string Descricao, double TotalFormaPagto)
+    private FechamentoDTO GetFechamentoDTO(DateTime dataInicio, DateTime dataFim, string descricao, double totalFormaPagto)
     {
         return new FechamentoDTO {
-            DataHoraInicio = DataInicio,
-            DataHoraFim = DataFim,
-            FormaPagamento = Descricao,
-            ValorTotal = Math.Truncate(TotalFormaPagto * 100) / 100
+            DataHoraInicio = dataInicio,
+            DataHoraFim = dataFim,
+            FormaPagamento = descricao,
+            ValorTotal = Math.Truncate(totalFormaPagto * 100) / 100
         };
+    }
+
+    private void fazFechamentoEstadia (Garagem garagem, Passagem passagem)
+    {
+        double valorEstadia = CalculaPrecoEstadia(garagem, passagem);
+        passagem.PrecoTotal = valorEstadia;
+        DB.Update(passagem);
+        DB.SaveChanges();
     }
 
 }

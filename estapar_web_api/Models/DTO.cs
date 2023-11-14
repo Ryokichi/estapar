@@ -4,6 +4,24 @@ public class GaragemDTO
     public string Nome { get; set; }
 }
 
+public class FormaPagamentoDTO
+{
+    public string Codigo { get; set; }
+    public string Descricao { get; set; }
+}
+
+public class PassagemDTO
+{
+    public string Garagem { get; set; }
+    public string CarroPlaca { get; set; }
+    public string CarroMarca { get; set; }
+    public string CarroModelo { get; set; }
+    public string DataHoraEntrada { get; set; }
+    public string DataHoraSaida { get; set; }
+    public string FormaPagamento { get; set; }
+    public double PrecoTotal { get; set; }
+}
+
 public class CarroDTO
 {
     public string Garagem { get; set; }

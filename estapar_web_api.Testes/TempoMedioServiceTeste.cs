@@ -12,6 +12,23 @@ public class TempoMedioServiceTeste
     }
 
     [Fact]
+    public void TempoMinutos_1sec()
+    {
+        DateTime dataHoraEntrada    = DateTime.Parse("2023-01-01 00:00:00");
+        DateTime dataHoraSaida      = DateTime.Parse("2023-01-01 00:00:01");
+        var tempo = tms.GetTimeSpanEmMinutos(dataHoraEntrada, dataHoraSaida );
+        Assert.Equal(0, tempo);
+    }
+
+    public void TempoMinutos_1min()
+    {
+        DateTime dataHoraEntrada    = DateTime.Parse("2023-01-01 00:00:00");
+        DateTime dataHoraSaida      = DateTime.Parse("2023-01-01 00:01:00");
+        var tempo = tms.GetTimeSpanEmMinutos(dataHoraEntrada, dataHoraSaida );
+        Assert.Equal(0, tempo);
+    }
+
+    [Fact]
     public void PrecoEstadia_1min()
     {
         DateTime dataHoraEntrada    = DateTime.Parse("2023-01-01 00:00:00");
@@ -79,5 +96,35 @@ public class TempoMedioServiceTeste
         var valor = tms.CalculaPrecoEstadia(dataHoraEntrada, dataHoraSaida, 25, 15.8);
 
         Assert.Equal(40.8, valor);
+    }
+
+    [Fact]
+    public void PrecoEstadia_119min()
+    {
+        DateTime dataHoraEntrada    = DateTime.Parse("2023-01-01 00:00:00");
+        DateTime dataHoraSaida      = DateTime.Parse("2023-01-01 01:59:00");
+        var valor = tms.CalculaPrecoEstadia(dataHoraEntrada, dataHoraSaida, 25, 15.8);
+
+        Assert.Equal(40.8, valor);
+    }
+
+    [Fact]
+    public void PrecoEstadia_120min()
+    {
+        DateTime dataHoraEntrada    = DateTime.Parse("2023-01-01 00:00:00");
+        DateTime dataHoraSaida      = DateTime.Parse("2023-01-01 02:00:59");
+        var valor = tms.CalculaPrecoEstadia(dataHoraEntrada, dataHoraSaida, 25, 15.8);
+
+        Assert.Equal(40.8, valor);
+    }
+
+    [Fact]
+    public void PrecoEstadia_121min()
+    {
+        DateTime dataHoraEntrada    = DateTime.Parse("2023-01-01 00:00:00");
+        DateTime dataHoraSaida      = DateTime.Parse("2023-01-01 02:01:00");
+        var valor = tms.CalculaPrecoEstadia(dataHoraEntrada, dataHoraSaida, 25, 15.8);
+
+        Assert.Equal(48.7, valor);
     }
 }

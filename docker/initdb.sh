@@ -1,1 +1,1 @@
-/opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P o4bLty#m -d master -i /tmp/init_db.sql
+/opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P passwd-db-estapar -d master -i /tmp/init_db.sql
