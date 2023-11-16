@@ -11,7 +11,7 @@ using estapar_web_api;
 namespace estapar_web_api.Migrations
 {
     [DbContext(typeof(EstaparDbContext))]
-    [Migration("20231109005519_CreateFormaPagamentoTable")]
+    [Migration("20231115200130_CreateFormaPagamentoTable")]
     partial class CreateFormaPagamentoTable
     {
         /// <inheritdoc />
@@ -36,6 +36,29 @@ namespace estapar_web_api.Migrations
                     b.HasKey("Codigo");
 
                     b.ToTable("FormaPagamento");
+                });
+
+            modelBuilder.Entity("Garagem", b =>
+                {
+                    b.Property<string>("Codigo")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Preco_1aHora")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Preco_HorasExtra")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Preco_Mensalista")
+                        .HasColumnType("float");
+
+                    b.HasKey("Codigo");
+
+                    b.ToTable("Garagem");
                 });
 #pragma warning restore 612, 618
         }

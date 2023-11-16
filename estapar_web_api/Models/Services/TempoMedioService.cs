@@ -1,6 +1,6 @@
 using estapar_web_api;
 
-public class TempoMedioService : CommomService
+public class TempoMedioService : CommomService, ITempoMedioService 
 {
 
     public TempoMedioService(EstaparDbContext ctx): base(ctx)

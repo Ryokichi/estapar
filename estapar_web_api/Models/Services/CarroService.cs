@@ -1,8 +1,5 @@
-using Microsoft.OpenApi.Expressions;
 using estapar_web_api;
-using System.Text.Json.Nodes;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+
 
 public class CarroService : CommomService
 {
@@ -10,20 +7,38 @@ public class CarroService : CommomService
     {
     }
 
-    public List<CarroDTO> BuscaCarrosNaGaragemPorPeriodo(string codGaragem, DateTime dataInicio, DateTime dataFim)
+    public UserResponse BuscaCarrosNaGaragemPorPeriodo(string codGaragem, DateTime dataInicio, DateTime dataFim)
     {
-        return DB.Passagem
-            .Where(p => p.Garagem.Codigo == codGaragem)
-            .Where(p => p.DataHoraEntrada >= dataInicio && p.DataHoraSaida <= dataFim)
-            .Select(p => new CarroDTO
-            {
-                Garagem = p.Garagem.Nome,
-                CarroMarca = p.CarroMarca,
-                CarroPlaca = p.CarroPlaca,
-                CarroModelo = p.CarroModelo,
-                DataHoraEntrada = p.DataHoraEntrada,
-                DataHoraSaida = p.DataHoraSaida,
-            }).ToList();
+        string usrMensagem;
+        List<EstadiaDTO> usrRetorno = new List<EstadiaDTO>();
+
+        if (dataInicio > dataFim) {
+            usrMensagem = "Data de inicio da pesquisa não pode ser maior que a de fim";
+        }
+        else
+        {
+            usrMensagem = "Ok";
+            usrRetorno = DB.Passagem
+                .Where(p => p.Garagem.Codigo == codGaragem)
+                .Where(p => p.DataHoraEntrada >= dataInicio && p.DataHoraSaida <= dataFim)
+                .Select(p => new EstadiaDTO {
+                    Garagem = p.Garagem.Nome,
+                    CarroPlaca = p.CarroPlaca,
+                    CarroMarca = p.CarroMarca,
+                    CarroModelo = p.CarroModelo,
+                    DataHoraEntrada = p.DataHoraEntrada,
+                    DataHoraSaida = p.DataHoraSaida,
+                    TempoEstadia = calculaTempoEstadia(p),
+                    FormaPagamento = p.FormaPagamento.Descricao,
+                    PrecoTotal = CalculaPrecoEstadia(p, p.Garagem, p.FormaPagamento)
+                })
+                .ToList();
+        }
+
+        return new UserResponse {
+            Mensagem = usrMensagem,
+            Retorno = usrRetorno
+        };
     }
 
     public List<CarroDTO>BuscaCarrosEstacionados(string codGaragem)
@@ -74,7 +89,9 @@ public class CarroService : CommomService
                     CarroPlaca = p.CarroPlaca,
                     CarroModelo = p.CarroModelo,
                     DataHoraEntrada = p.DataHoraEntrada,
-                    DataHoraSaida = p.DataHoraSaida
+                    FormaPagamento = p.FormaPagamento.Descricao,
+                    DataHoraSaida = p.DataHoraSaida,
+                    PrecoTotal = CalculaPrecoEstadia(p, p.Garagem, p.FormaPagamento)
                 })
                 .FirstOrDefault();
 
@@ -142,12 +159,13 @@ public class CarroService : CommomService
         };
     }
 
-    public RegistroPassagemDTO PostCadastroSaidaPassagem(string codGaragem, PassagemCadastroSaida DadosSaida)
+    public RegistroPassagemDTO PostCadastroSaidaPassagem(string codGaragem, PassagemCadastroSaida dadosSaida)
     {
         string msgToUser = "";
         var garagem = DB.Garagem.Where(g => g.Codigo == codGaragem).FirstOrDefault();
+        var formaPgto = DB.FormaPagamento.Where(f => f.Codigo == dadosSaida.FormaPagamento).FirstOrDefault();
         var passagem = DB.Passagem.Where(p => p.Garagem.Codigo == codGaragem
-            && p.CarroPlaca == DadosSaida.CarroPlaca)
+            && p.CarroPlaca == dadosSaida.CarroPlaca)
             .OrderBy(p => p.DataHoraEntrada)
             .LastOrDefault();
         CarroDTO dadosPassagem = new CarroDTO();
@@ -155,6 +173,10 @@ public class CarroService : CommomService
         if (garagem == null)
         {
             msgToUser = "Garagem não encontrada";
+        }
+        else if (formaPgto == null)
+        {
+            msgToUser = "Forma de pagamento inválida";
         }
         else if (passagem == null )
         {
@@ -166,48 +188,19 @@ public class CarroService : CommomService
         }
         else 
         {
-            DateTime DataHoraSaida = DateTime.Parse(DateTime.Now.ToString("s"));
-            Double PrecoTotal = CalculaPrecoEstadia(garagem, passagem);
-
-            passagem.DataHoraSaida = DataHoraSaida;
-            passagem.PrecoTotal = PrecoTotal;
+            passagem.FormaPagamento = formaPgto;
+            passagem.DataHoraSaida = DateTime.Parse(DateTime.Now.ToString("s"));
+            passagem.PrecoTotal = CalculaPrecoEstadia(passagem, garagem, formaPgto);
             DB.Update(passagem);
             DB.SaveChanges();
 
             dadosPassagem = convertePassagemParaDTO(passagem);
+            msgToUser = "Registro de saida criado com sucesso.";
 
         }
         return new RegistroPassagemDTO {
             Mensagem = msgToUser,
             Passagem = dadosPassagem
-        };
-    }
-
-    public object PostSeedPassagemDB( List<PassagemDTO> seedPassagens)
-    {
-        int Sucessos = 0;
-        int Falhas = 0;
-
-        foreach (var seedPassagem in seedPassagens) 
-        {
-            var garagem = DB.Garagem.Where(g => g.Codigo == seedPassagem.Garagem ).FirstOrDefault();
-            if (garagem != null) {
-                
-                Passagem passagem = convertPassagemDTOParaPassagem(garagem, seedPassagem);
-                passagem.PrecoTotal = CalculaPrecoEstadia(garagem, passagem);
-
-                DB.Add(passagem);
-                DB.SaveChanges();
-                Sucessos ++;
-            }
-            else {
-                Falhas ++;
-            }
-        }
-
-        return new {
-            Sucessos = Sucessos,
-            Falhas = Falhas,
         };
     }
 
@@ -227,7 +220,7 @@ public class CarroService : CommomService
         };
     }
 
-    private CarroDTO convertePassagemParaDTO(Passagem passagem)
+    private static CarroDTO convertePassagemParaDTO(Passagem passagem)
     {
         return new CarroDTO
         {
@@ -237,7 +230,37 @@ public class CarroService : CommomService
             CarroModelo = passagem.CarroModelo,
             DataHoraEntrada = passagem.DataHoraEntrada,
             DataHoraSaida = passagem.DataHoraSaida,
-            ValorTotal = passagem.PrecoTotal
+            FormaPagamento = (passagem.FormaPagamento == null) ? "" : passagem.FormaPagamento.Descricao,
+            PrecoTotal = passagem.PrecoTotal
         };
     }
+
+    public object PostSeedPassagemDB( List<PassagemDTO> seedPassagens)
+    {
+        int Sucessos = 0;
+        int Falhas = 0;
+
+        foreach (var seedPassagem in seedPassagens) 
+        {
+            var garagem = DB.Garagem.Where(g => g.Codigo == seedPassagem.Garagem ).FirstOrDefault();
+            if (garagem != null) {
+                
+                Passagem passagem = convertPassagemDTOParaPassagem(garagem, seedPassagem);
+                passagem.PrecoTotal = CalculaPrecoEstadia(passagem, passagem.Garagem, passagem.FormaPagamento);
+
+                DB.Add(passagem);
+                DB.SaveChanges();
+                Sucessos ++;
+            }
+            else {
+                Falhas ++;
+            }
+        }
+
+        return new {
+            Sucessos = Sucessos,
+            Falhas = Falhas,
+        };
+    }
+
 }

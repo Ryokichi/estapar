@@ -8,5 +8,6 @@ public class Passagem
     public DateTime DataHoraEntrada { get; set; }
     public DateTime? DataHoraSaida { get; set; }
     public FormaPagamento? FormaPagamento { get; set; }
-    public double PrecoTotal  { get; set; } = 0.0;
+    public double PrecoTotal { get; set; } = 0.0;
+
 }

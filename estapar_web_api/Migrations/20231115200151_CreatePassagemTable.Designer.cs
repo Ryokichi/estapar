@@ -12,7 +12,7 @@ using estapar_web_api;
 namespace estapar_web_api.Migrations
 {
     [DbContext(typeof(EstaparDbContext))]
-    [Migration("20231109005636_CreatePassagemTable")]
+    [Migration("20231115200151_CreatePassagemTable")]
     partial class CreatePassagemTable
     {
         /// <inheritdoc />
@@ -41,15 +41,8 @@ namespace estapar_web_api.Migrations
 
             modelBuilder.Entity("Garagem", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<string>("Codigo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Nome")
                         .IsRequired()
@@ -64,7 +57,7 @@ namespace estapar_web_api.Migrations
                     b.Property<double>("Preco_Mensalista")
                         .HasColumnType("float");
 
-                    b.HasKey("Id");
+                    b.HasKey("Codigo");
 
                     b.ToTable("Garagem");
                 });
@@ -98,8 +91,9 @@ namespace estapar_web_api.Migrations
                     b.Property<string>("FormaPagamentoCodigo")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("GaragemId")
-                        .HasColumnType("int");
+                    b.Property<string>("GaragemCodigo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<double>("PrecoTotal")
                         .HasColumnType("float");
@@ -108,7 +102,7 @@ namespace estapar_web_api.Migrations
 
                     b.HasIndex("FormaPagamentoCodigo");
 
-                    b.HasIndex("GaragemId");
+                    b.HasIndex("GaragemCodigo");
 
                     b.ToTable("Passagem");
                 });
@@ -121,7 +115,7 @@ namespace estapar_web_api.Migrations
 
                     b.HasOne("Garagem", "Garagem")
                         .WithMany()
-                        .HasForeignKey("GaragemId")
+                        .HasForeignKey("GaragemCodigo")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

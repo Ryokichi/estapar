@@ -1,5 +1,3 @@
-using System.Data;
-using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers;
@@ -8,11 +6,32 @@ namespace api.Controllers;
 [Route("[controller]")]
 public class EstaparAdminController : ControllerBase
 {
+    [HttpPost("seed-passagem-db")]
+    public IActionResult postSeedPassagemDB([FromBody] List<PassagemDTO> dadosDaEntrada, [FromServices] CarroService dbService)
+    {
+        object postCadastroNovasPassagens = dbService.PostSeedPassagemDB(dadosDaEntrada);
+        return Ok(postCadastroNovasPassagens);
+    }
+
+    [HttpPost("{codGaragem}/registrar-entrada")]
+    public IActionResult postNovatEntradaCarro(string codGaragem, [FromBody] PassagemCadastroEntrada dadosDaEntrada, [FromServices] CarroService dbService)
+    {
+        RegistroPassagemDTO postCadastroNovaPassagem = dbService.PostCadastroNovaPassagem(codGaragem, dadosDaEntrada);
+        return Ok(postCadastroNovaPassagem);
+    }
+
+    [HttpPost("{codGaragem}/registrar-saida")]
+    public IActionResult posSaidaCarrostring(string codGaragem, [FromBody] PassagemCadastroSaida dadosDaSaida, [FromServices] CarroService dbService)
+    {
+        RegistroPassagemDTO tempoMedioDto = dbService.PostCadastroSaidaPassagem(codGaragem, dadosDaSaida);
+        return Ok(tempoMedioDto);
+    }
+
     [HttpGet("{codGaragem}/carros-no-periodo")]
     public IActionResult getCarrosPeriodo(string codGaragem, [FromQuery] DateTime dataInicio, [FromQuery] DateTime dataFim, [FromServices] CarroService dbService)
     {
-        List<CarroDTO> carrosDto = dbService.BuscaCarrosNaGaragemPorPeriodo(codGaragem, dataInicio, dataFim);
-        return Ok(carrosDto);
+        UserResponse carrosPeriodo = dbService.BuscaCarrosNaGaragemPorPeriodo(codGaragem, dataInicio, dataFim);
+        return Ok(carrosPeriodo);
     }
 
     [HttpGet("{codGaragem}/carros-estacionados")]
@@ -41,27 +60,6 @@ public class EstaparAdminController : ControllerBase
     {
         List<TempoMedioDTO> tempoMedioDto = dbService.ExecutaCalculoDeTempoMedioNoPeriodo(codGaragem, dataInicio, dataFim);
         return Ok(tempoMedioDto);
-    }
-
-    [HttpPost("{codGaragem}/registrar-entrada")]
-    public IActionResult postNovatEntradaCarro(string codGaragem, [FromBody] PassagemCadastroEntrada dadosDaEntrada, [FromServices] CarroService dbService)
-    {
-        RegistroPassagemDTO postCadastroNovaPassagem = dbService.PostCadastroNovaPassagem(codGaragem, dadosDaEntrada);
-        return Ok(postCadastroNovaPassagem);
-    }
-
-    [HttpPost("{codGaragem}/registrar-saida")]
-    public IActionResult posSaidaCarrostring(string codGaragem, [FromBody] PassagemCadastroSaida dadosDaSaida, [FromServices] CarroService dbService)
-    {
-        RegistroPassagemDTO tempoMedioDto = dbService.PostCadastroSaidaPassagem(codGaragem, dadosDaSaida);
-        return Ok(tempoMedioDto);
-    }
-
-    [HttpPost("seed-passagem-db")]
-    public IActionResult postSeedPassagemDB([FromBody] List<PassagemDTO> dadosDaEntrada, [FromServices] CarroService dbService)
-    {
-        object postCadastroNovasPassagens = dbService.PostSeedPassagemDB(dadosDaEntrada);
-        return Ok(postCadastroNovasPassagens);
     }
 
     [HttpGet("lista-todas-garagens")]

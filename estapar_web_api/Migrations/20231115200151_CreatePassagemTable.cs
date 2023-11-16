@@ -17,7 +17,7 @@ namespace estapar_web_api.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    GaragemId = table.Column<int>(type: "int", nullable: false),
+                    GaragemCodigo = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CarroPlaca = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CarroMarca = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CarroModelo = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -35,10 +35,10 @@ namespace estapar_web_api.Migrations
                         principalTable: "FormaPagamento",
                         principalColumn: "Codigo");
                     table.ForeignKey(
-                        name: "FK_Passagem_Garagem_GaragemId",
-                        column: x => x.GaragemId,
+                        name: "FK_Passagem_Garagem_GaragemCodigo",
+                        column: x => x.GaragemCodigo,
                         principalTable: "Garagem",
-                        principalColumn: "Id",
+                        principalColumn: "Codigo",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -48,9 +48,9 @@ namespace estapar_web_api.Migrations
                 column: "FormaPagamentoCodigo");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Passagem_GaragemId",
+                name: "IX_Passagem_GaragemCodigo",
                 table: "Passagem",
-                column: "GaragemId");
+                column: "GaragemCodigo");
         }
 
         /// <inheritdoc />

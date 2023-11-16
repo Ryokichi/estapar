@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using estapar_web_api;
 
 public class CommomService
@@ -24,27 +25,53 @@ public class CommomService
         return DB.Passagem.ToList();
     }
 
-    public int GetTimeSpanEmMinutos(DateTime DataInicio, DateTime DataFim)
+    public List<Passagem> BuscaCarrosNoPeriodoPorFormaPagto(string codGaragem, DateTime dataInicio, DateTime dataFim, String pagamento )
     {
-        TimeSpan Diferenca = DataInicio - DataFim;
-        int SpanHoras = Diferenca.Duration().Days * 24 + Diferenca.Duration().Hours;
-        int SpanMinutos = SpanHoras * 60 + Diferenca.Duration().Minutes;
-        return SpanMinutos;
+        return DB.Passagem
+            .Where(p => p.Garagem.Codigo == codGaragem
+                && p.FormaPagamento.Codigo == pagamento
+                && p.DataHoraSaida >= dataInicio
+                && p.DataHoraSaida <= dataFim
+            )
+            .ToList();
     }
 
-    public double CalculaPrecoEstadia( Garagem garagem, Passagem passagem)
+    public static string calculaTempoEstadia(Passagem passagem)
     {
-        if (passagem.FormaPagamento.Codigo == "MEN" || passagem.DataHoraSaida == null)
-            return 0;
+        TimeSpan tempo = new TimeSpan();
+        if (passagem.DataHoraSaida != null) {
+            tempo = passagem.DataHoraSaida.Value - passagem.DataHoraEntrada;
+        }
+        return String.Format("{0:00}:{1:00}", (tempo.Days*24 + tempo.Hours), tempo.Minutes);
+    }
 
-        DateTime DataInicio = passagem.DataHoraEntrada;
-        DateTime DataFim = passagem.DataHoraSaida.Value;
+    public static int GetTimeSpanEmMinutos(DateTime dataInicio, DateTime dataFim)
+    {
+        TimeSpan diferenca = dataInicio - dataFim;
+        int spanHoras = diferenca.Duration().Days * 24 + diferenca.Duration().Hours;
+        int spanMinutos = spanHoras * 60 + diferenca.Duration().Minutes;
+        return spanMinutos;
+    }
+
+    public static double CalculaPrecoEstadia(Passagem passagem, Garagem garagem, FormaPagamento? formaPagamento)
+    {
+        if (formaPagamento == null || formaPagamento.Codigo == "MEN" || passagem.DataHoraSaida == null)
+        {
+            return 0;
+        }
+        if (passagem.PrecoTotal > 0)
+        {
+            return passagem.PrecoTotal;
+        }
+
+        DateTime dataInicio = passagem.DataHoraEntrada;
+        DateTime dataFim = passagem.DataHoraSaida.Value;
         double PrecoHora1 = garagem.Preco_1aHora;
         double PrecoHoraExtra = garagem.Preco_HorasExtra;
         double TotalACobrar;
         int PeriodoMinutos, Horas, Minutos;
 
-        PeriodoMinutos = GetTimeSpanEmMinutos(DataInicio, DataFim);
+        PeriodoMinutos = GetTimeSpanEmMinutos(dataInicio, dataFim);
         TotalACobrar = PrecoHora1;
         if (PeriodoMinutos > 60) {
             Horas =  (PeriodoMinutos / 60) - 1;
@@ -59,14 +86,4 @@ public class CommomService
         return TotalACobrar;
     }
 
-    public List<Passagem> BuscaCarrosNoPeriodoPorFormaPagto(string codGaragem, DateTime dataInicio, DateTime dataFim, String pagamento )
-    {
-        return DB.Passagem
-            .Where(p => p.Garagem.Codigo == codGaragem
-                && p.FormaPagamento.Codigo == pagamento
-                && p.DataHoraSaida >= dataInicio
-                && p.DataHoraSaida <= dataFim
-            )
-            .ToList();
-    }
 }

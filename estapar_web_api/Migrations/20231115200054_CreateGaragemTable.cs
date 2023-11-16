@@ -14,9 +14,7 @@ namespace estapar_web_api.Migrations
                 name: "Garagem",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Codigo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Codigo = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Preco_1aHora = table.Column<double>(type: "float", nullable: false),
                     Preco_HorasExtra = table.Column<double>(type: "float", nullable: false),
@@ -24,7 +22,7 @@ namespace estapar_web_api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Garagem", x => x.Id);
+                    table.PrimaryKey("PK_Garagem", x => x.Codigo);
                 });
         }
 

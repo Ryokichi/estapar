@@ -11,7 +11,7 @@ using estapar_web_api;
 namespace estapar_web_api.Migrations
 {
     [DbContext(typeof(EstaparDbContext))]
-    [Migration("20231109005557_CreateGaragemTable")]
+    [Migration("20231115200054_CreateGaragemTable")]
     partial class CreateGaragemTable
     {
         /// <inheritdoc />
@@ -24,31 +24,10 @@ namespace estapar_web_api.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("FormaPagamento", b =>
+            modelBuilder.Entity("Garagem", b =>
                 {
                     b.Property<string>("Codigo")
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Descricao")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Codigo");
-
-                    b.ToTable("FormaPagamento");
-                });
-
-            modelBuilder.Entity("Garagem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Codigo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Nome")
                         .IsRequired()
@@ -63,7 +42,7 @@ namespace estapar_web_api.Migrations
                     b.Property<double>("Preco_Mensalista")
                         .HasColumnType("float");
 
-                    b.HasKey("Id");
+                    b.HasKey("Codigo");
 
                     b.ToTable("Garagem");
                 });

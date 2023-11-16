@@ -8,11 +8,6 @@ public class FechamentoService : CommomService
 
     public List<FechamentoDTO>ExecutaFecahamentoDoPeriodo(string codGaragem, DateTime dataInicio, DateTime dataFim )
     {
-        // Pegar carros no periodo, depois para cada um deles calcula o valor da estadia caso ja nao tenha claculado anteriormente
-        // e no caso da necessidade de calcular, utilizar o design abstract factory https://refactoring.guru/pt-br/design-patterns/abstract-factory
-        // para criar o meio de pagamento adequado. Armazena tudo isso num objeto que representa o fechamento da garagem no periodo.
-
-
         List<FechamentoDTO> fechamento = new List<FechamentoDTO>();
         List<FormaPagamento> formasPagamento = DB.FormaPagamento.ToList();
         Garagem garagem = DB.Garagem.Where(g => g.Codigo == codGaragem).First();
@@ -56,16 +51,15 @@ public class FechamentoService : CommomService
             DataHoraInicio = dataInicio,
             DataHoraFim = dataFim,
             FormaPagamento = descricao,
-            ValorTotal = Math.Truncate(totalFormaPagto * 100) / 100
+            PrecoTotal = Math.Truncate(totalFormaPagto * 100) / 100
         };
     }
 
     private void fazFechamentoEstadia (Garagem garagem, Passagem passagem)
     {
-        double valorEstadia = CalculaPrecoEstadia(garagem, passagem);
+        double valorEstadia = CalculaPrecoEstadia(passagem, passagem.Garagem, passagem.FormaPagamento);
         passagem.PrecoTotal = valorEstadia;
         DB.Update(passagem);
         DB.SaveChanges();
     }
-
 }
