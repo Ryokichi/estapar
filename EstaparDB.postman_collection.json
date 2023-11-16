@@ -1,0 +1,311 @@
+{
+	"info": {
+		"_postman_id": "5510d5f9-6e9a-4251-b3d7-18a278deddc6",
+		"name": "EstaparDB",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31072737"
+	},
+	"item": [
+		{
+			"name": "Popular DB",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    {\r\n        \"garagem\":\"COTO01\",\r\n        \"carroPlaca\": \"ABC-1234\",\r\n        \"carroMarca\": \"FIAT\",\r\n        \"carroModelo\": \"UNO\",\r\n        \"dataHoraEntrada\": \"2024-11-16 09:27:19\",\r\n        \"dataHoraSaida\": \"2024-11-16 10:30:32\",\r\n        \"formaPagamento\": \"MEN\",\r\n        \"valorTotal\": 0\r\n    },\r\n    {\r\n        \"garagem\":\"COTO01\",\r\n        \"carroPlaca\": \"ABC-1234\",\r\n        \"carroMarca\": \"FIAT\",\r\n        \"carroModelo\": \"UNO\",\r\n        \"dataHoraEntrada\": \"2024-11-16 09:10:19\",\r\n        \"dataHoraSaida\": \"2024-11-16 19:40:32\",\r\n        \"formaPagamento\": \"MEN\",\r\n        \"valorTotal\": 0\r\n    },\r\n    {\r\n        \"garagem\":\"COTO01\",\r\n        \"carroPlaca\": \"ABC-9012\",\r\n        \"carroMarca\": \"FIAT\",\r\n        \"carroModelo\": \"UNO\",\r\n        \"dataHoraEntrada\": \"2024-11-17 09:27:19\",\r\n        \"dataHoraSaida\": \"2024-11-17 09:27:32\",\r\n        \"formaPagamento\": \"PIX\",\r\n        \"valorTotal\": 0\r\n    }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/EstaparAdmin/seed-passagem-db",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"EstaparAdmin",
+						"seed-passagem-db"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Registrar de entrada de carro",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "    {\r\n    \"CarroPlaca\": \"ABC-4867\",\r\n    \"CarroMarca\": \"FORD\",\r\n    \"CarroModelo\": \"FOCUS\"\r\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/EstaparAdmin/{{cod_garagem}}/registrar-entrada",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"EstaparAdmin",
+						"{{cod_garagem}}",
+						"registrar-entrada"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Registrar saida de carro",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"CarroPlaca\": \"ABC-4867\",\r\n    \"FormaPagamento\" : \"PIX\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/EstaparAdmin/{{cod_garagem}}/registrar-saida",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"EstaparAdmin",
+						"{{cod_garagem}}",
+						"registrar-saida"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Carros no periodo",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"url": {
+					"raw": "{{url}}/EstaparAdmin/{{cod_garagem}}/carros-no-periodo?DataInicio=2021-09-06 18:00&DataFim=2025-09-06 18:00",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"EstaparAdmin",
+						"{{cod_garagem}}",
+						"carros-no-periodo"
+					],
+					"query": [
+						{
+							"key": "DataInicio",
+							"value": "2021-09-06 18:00"
+						},
+						{
+							"key": "DataFim",
+							"value": "2025-09-06 18:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Carros estaciondos",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/EstaparAdmin/{{cod_garagem}}/carros-estacionados",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"EstaparAdmin",
+						"{{cod_garagem}}",
+						"carros-estacionados"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Carros que passaram",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/EstaparAdmin/{{cod_garagem}}/carros-que-passaram",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"EstaparAdmin",
+						"{{cod_garagem}}",
+						"carros-que-passaram"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fechamento do periodo",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/EstaparAdmin/{{cod_garagem}}/fechamento-periodo?DataInicio=2022-11-16&DataFim=2024-11-17",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"EstaparAdmin",
+						"{{cod_garagem}}",
+						"fechamento-periodo"
+					],
+					"query": [
+						{
+							"key": "DataInicio",
+							"value": "2022-11-16"
+						},
+						{
+							"key": "DataFim",
+							"value": "2024-11-17"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Tempo medio",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/EstaparAdmin/{{cod_garagem}}/tempo-medio?DataInicio=2020-01-02&DataFim=2025-01-01",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"EstaparAdmin",
+						"{{cod_garagem}}",
+						"tempo-medio"
+					],
+					"query": [
+						{
+							"key": "DataInicio",
+							"value": "2020-01-02"
+						},
+						{
+							"key": "DataFim",
+							"value": "2025-01-01"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Lista garagens",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/EstaparAdmin/lista-todas-garagens",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"EstaparAdmin",
+						"lista-todas-garagens"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Lista pagamentos",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/EstaparAdmin/lista-todos-pagamentos",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"EstaparAdmin",
+						"lista-todos-pagamentos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Lista passagens",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/EstaparAdmin/lista-todas-passagens",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"EstaparAdmin",
+						"lista-todas-passagens"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "cod_garagem",
+			"value": "EVO01",
+			"type": "string"
+		}
+	]
+}
